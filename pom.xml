@@ -6,15 +6,15 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
+  <packaging>atlassian-plugin</packaging>
   <groupId>com.drunkendev.confluence.plugins</groupId>
   <artifactId>shownhide-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>Show and Hide Plugin</name>
-  <packaging>atlassian-plugin</packaging>
+  <version>1.0</version>
  
   <description>
-  Plugin to confluence to provide a macro to enable users to show/hide
-  content within a from/to time period.
+    Plugin to confluence to provide a macro to enable users to show/hide content
+    within a from/to time period.
   </description>
 
   <organization>
