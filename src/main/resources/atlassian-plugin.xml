@@ -11,6 +11,25 @@
             url="${project.organization.url}" />
   </plugin-info>
 
+  <resource type="i18n" name="i18n" location="i18n/shownhide" />
+
+  <macro name="shownhide"
+         key="shownhide"
+         class="com.drunkendev.confluence.plugins.shownhide.ShownHideMacro">
+    <category>formatting</category>
+    <description>
+      Only shows content if the current date is in a specified date range.
+    </description>
+    <parameters>
+      <parameter name="startDate" type="string">
+        <alias name="startDate"/>
+      </parameter>
+      <parameter name="endDate" type="string">
+        <alias name="endDate"/>
+      </parameter>
+    </parameters>
+  </macro>
+
 </atlassian-plugin>
 
 <!--
