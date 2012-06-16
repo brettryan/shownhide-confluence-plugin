@@ -19,6 +19,9 @@
 
 package com.drunkendev.confluence.plugins.shownhide;
 
+import com.atlassian.confluence.content.render.xhtml.ConversionContext;
+import com.atlassian.confluence.macro.Macro;
+import com.atlassian.confluence.macro.MacroExecutionException;
 import com.atlassian.renderer.RenderContext;
 import com.atlassian.renderer.v2.RenderMode;
 import com.atlassian.renderer.v2.macro.BaseMacro;
@@ -28,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -35,9 +39,9 @@ import java.util.Map;
  * start/end date range.
  *
  * @author  Brett Ryan
- * @version 1.0
+ * @version 1.1
  */
-public class ShownHideMacro extends BaseMacro {
+public class ShownHideMacro extends BaseMacro implements Macro {
 
     private static final String KEY_START_DATE = "startDate";
     private static final String KEY_END_DATE = "endDate";
@@ -61,7 +65,7 @@ public class ShownHideMacro extends BaseMacro {
     /**
      * I have to return false here in order to stop the leading paragraph from
      * being rendered, I'm not sure why.
-     * 
+     *
      * @return  false - this is not an in-line macro.
      */
     @Override
@@ -71,9 +75,10 @@ public class ShownHideMacro extends BaseMacro {
 
     /**
      * Determines if the macro has a body content.
-     * 
+     *
      * @return  true - this macro requires a body.
      */
+    @Override
     public boolean hasBody() {
         return true;
     }
@@ -83,6 +88,7 @@ public class ShownHideMacro extends BaseMacro {
      *
      * @return  Everything except {@link com.atlassian.renderer.v2.RenderMode#F_FIRST_PARA}.
      */
+    @Override
     public RenderMode getBodyRenderMode() {
         return RenderMode.suppress(RenderMode.F_FIRST_PARA);
     }
@@ -102,21 +108,25 @@ public class ShownHideMacro extends BaseMacro {
      *          in a way that is important to the server maintainer (i.e.
      *          something is badly wrong), throw a RuntimeException instead.
      */
+    @Override
     public String execute(
             final Map parameters,
             final String body,
             final RenderContext renderContext)
             throws MacroException {
+        if (StringUtils.isBlank(body)) {
+            return StringUtils.EMPTY;
+        }
         long now = new Date().getTime();
         try {
             if (parameters.containsKey(KEY_START_DATE)) {
                 if (getDate((String) parameters.get(KEY_START_DATE)).getTime() >= now) {
-                    return "";
+                    return StringUtils.EMPTY;
                 }
             }
             if (parameters.containsKey(KEY_END_DATE)) {
                 if (getDate((String) parameters.get(KEY_END_DATE)).getTime() < now) {
-                    return "";
+                    return StringUtils.EMPTY;
                 }
             }
         } catch (ParseException ex) {
@@ -185,6 +195,29 @@ public class ShownHideMacro extends BaseMacro {
                 }
             }
         }
+    }
+
+    @Override
+    public String execute(
+            Map<String, String> parameters,
+            String body,
+            ConversionContext context)
+            throws MacroExecutionException {
+        try {
+            return execute(parameters, body, (RenderContext) null);
+        } catch (MacroException e) {
+            throw new MacroExecutionException(e);
+        }
+    }
+
+    @Override
+    public BodyType getBodyType() {
+        return BodyType.RICH_TEXT;
+    }
+
+    @Override
+    public OutputType getOutputType() {
+        return OutputType.BLOCK;
     }
 
 }
